@@ -2,8 +2,9 @@
 
 Replay-emitter is a simple tool to record/replay events from a file to nodejs EventEmitter.
 
-## Installation
+[![CI](https://github.com/oktapodia/replay-emitter/actions/workflows/ci.yml/badge.svg)](https://github.com/oktapodia/replay-emitter/actions/workflows/ci.yml)
 
+## Installation
 
 ```bash
 npm install replay-emitter
