@@ -1,0 +1,9 @@
+126	doorbellstate	"waiting for a ring..."
+632	doorbell	3
+634	doorbellhistorystate	["waiting for a ring...","rang for 3 seconds."]
+637	doorbellstate	"rang for 3 seconds."
+1645	doorbell	2
+1650	doorbellhistorystate	["waiting for a ring...","rang for 3 seconds.","rang for 2 seconds."]
+1652	doorbellstate	"rang for 2 seconds."
+3664	doorbellstate	"opening door"
+3668	doorbellhistorystate	["waiting for a ring...","rang for 3 seconds.","rang for 2 seconds.","opening door"]
