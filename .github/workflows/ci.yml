@@ -28,6 +28,7 @@ jobs:
         uses: actions/setup-node@v4.0.0
         with:
           node-version: 18
-      # Runs a single command using the runners shell
+      - name: Install dependencies
+        run: yarn install
       - name: Run tests
         run: yarn test
