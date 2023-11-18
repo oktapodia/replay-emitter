@@ -1,41 +1,41 @@
 import { EventEmitter } from 'events';
-import debug from 'debug';
 import { promises as fs } from 'fs';
-import setSystemTime = jest.setSystemTime;
+import EventHandler from './EventHandler';
 
 const log = require('debug')('replay')
 const events: EventHandler[] = [];
 
 interface IHandlerOptions {
   offset: number;
+  mode: 'auto' | 'manual',
+  events?: string[];
 }
 
-function handler(emitter: EventEmitter, options: IHandlerOptions = {
+const defaultOptions: IHandlerOptions = {
   offset: 0,
-}) {
+  mode: 'auto',
+  events: [],
+}
+
+function replayer(emitter: EventEmitter, options: Partial<IHandlerOptions>) {
+  options = {
+    ...defaultOptions,
+    ...options,
+  } as IHandlerOptions;
+
   if (!(emitter instanceof EventEmitter)) {
     throw new Error('emitter is not an instance of EventEmitter')
   }
 
   function loggerListener(eventName: string, ...args: [any]) {
-    events.push(new EventHandler(performance.now() + options.offset, eventName, ...args))
+    events.push(new EventHandler(performance.now() + options.offset!, eventName, ...args))
   }
 
-  for(const eventName of emitter.eventNames()) {
-    for (const listener of emitter.listeners(eventName)) {
-      emitter.prependListener(eventName, loggerListener.bind(null, eventName.toString()));
+  const eventNames = options.mode === 'auto' ? emitter.eventNames() : options.events || [];
 
-      log(`Registering event ${eventName.toString()}`);
-    }
-  }
-}
-
-class EventHandler {
-  constructor(public time: number, public event: string, public args: any[]) {
-  }
-
-  toString() {
-    return `${this.time.toFixed(0)}\t${this.event}\t${JSON.stringify(this.args)}`
+  for (const eventName of eventNames) {
+    emitter.prependListener(eventName, loggerListener.bind(null, eventName.toString()));
+    log(`Registering event ${eventName.toString()}`);
   }
 }
 
@@ -79,4 +79,4 @@ export async function execute(emitter: EventEmitter, path = 'replay.txt') {
   return start;
 }
 
-export default handler;
+export default replayer;
