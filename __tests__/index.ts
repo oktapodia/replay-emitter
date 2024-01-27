@@ -122,4 +122,26 @@ describe('Test suite', () => {
     expect(stubDoorbellhistorystate).toHaveBeenNthCalledWith(2, ['waiting for a ring...', 'rang for 3 seconds.', 'rang for 2 seconds.'])
     expect(stubDoorbellhistorystate).toHaveBeenNthCalledWith(3, ['waiting for a ring...', 'rang for 3 seconds.', 'rang for 2 seconds.', 'opening door'])
   })
+
+
+  test('Test can handle BigInt events', async () => {
+    const door = new EventEmitter();
+
+    const stubBitIntEvent = jest.fn()
+    door.on("doorbell", stubBitIntEvent);
+
+    handler(door, { offset: -1000, mode: 'manual', events: ['doorbell'] })
+
+    const spyEmitter = jest.spyOn(door, 'emit')
+
+    door.emit("doorbell", { s: BigInt(42) });
+
+    expect(spyEmitter).toHaveBeenCalledTimes(1)
+    expect(stubBitIntEvent).toHaveBeenNthCalledWith(1, { s: BigInt(42) })
+
+    await replayEnd();
+
+    // @TODO test file contents
+    expect((await fs.stat('replay.txt')).isFile()).toEqual(true);
+  })
 })
