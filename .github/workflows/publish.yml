@@ -24,16 +24,17 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Setup git
+        run: |
+          git config user.name "$(git log -n 1 --pretty=format:%an)"
+          git config user.email "$(git log -n 1 --pretty=format:%ae)"
+
       - name: Install Dependencies
         run: yarn install
       - name: Build
         run: yarn build
       - name: Bump npm version
         run: npm version ${{ inputs.version }}
-      - name: Setup git
-        run: |
-          git config user.name "$(git log -n 1 --pretty=format:%an)"
-          git config user.email "$(git log -n 1 --pretty=format:%ae)"
       - name: Prepares changes
         run: |
           git add package.json
