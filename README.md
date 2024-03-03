@@ -16,11 +16,12 @@ yarn add replay-emitter
 
 ## Options
 
-| Option   | Type             | Default | Description                                 |
-|----------|------------------|---------|---------------------------------------------|
-| `offset` | `number`         | 0       | time offset                                 |
-| `mode`   | `auto \| manual` | `auto`  | Specify the mode                            |
-| `events` | `string[]`       | []      | If manual mode, the events you wanna record |
+| Option             | Type             | Default | Description                                 |
+|--------------------|------------------|---------|---------------------------------------------|
+| `offset`           | `number`         | 0       | time offset                                 |
+| `mode`             | `auto \| manual` | `auto`  | Specify the mode                            |
+| `events`           | `string[]`       | []      | If manual mode, the events you wanna record |
+| `startAtTimestamp` | `number`           | 0       | Timestamp from when to start the recording  |
 
 ## Usage
 
