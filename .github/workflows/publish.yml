@@ -38,7 +38,7 @@ jobs:
       - name: Prepares changes
         run: |
           git add package.json
-          git commit -m "Bump version to ${{ inputs.version }}"
+          git push
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
