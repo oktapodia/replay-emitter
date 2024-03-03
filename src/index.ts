@@ -1,17 +1,20 @@
 import { EventEmitter } from 'events';
 import { promises as fs } from 'fs';
 import EventHandler from './EventHandler';
+import { start } from 'node:repl';
 
 const log = require('debug')('replay')
 const events: EventHandler[] = [];
 
 interface IHandlerOptions {
+  startAtTimestamp?: number;
   offset: number;
   mode: 'auto' | 'manual',
   events?: string[];
 }
 
 const defaultOptions: IHandlerOptions = {
+  startAtTimestamp: 0,
   offset: 0,
   mode: 'auto',
   events: [],
@@ -27,8 +30,13 @@ function replayer(emitter: EventEmitter, options: Partial<IHandlerOptions>) {
     throw new Error('emitter is not an instance of EventEmitter')
   }
 
+  let startAtTimestamp = 0
+  if (options.startAtTimestamp) {
+    startAtTimestamp = options.startAtTimestamp;
+  }
+
   function loggerListener(eventName: string, ...args: [any]) {
-    events.push(new EventHandler(performance.now() + options.offset!, eventName, ...args))
+    events.push(new EventHandler(performance.now() - startAtTimestamp + options.offset!, eventName, ...args))
   }
 
   const eventNames = options.mode === 'auto' ? emitter.eventNames() : options.events || [];

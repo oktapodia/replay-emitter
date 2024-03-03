@@ -123,7 +123,6 @@ describe('Test suite', () => {
     expect(stubDoorbellhistorystate).toHaveBeenNthCalledWith(3, ['waiting for a ring...', 'rang for 3 seconds.', 'rang for 2 seconds.', 'opening door'])
   })
 
-
   test('Test can handle BigInt events', async () => {
     const door = new EventEmitter();
 
@@ -144,4 +143,81 @@ describe('Test suite', () => {
     // @TODO test file contents
     expect((await fs.stat('replay.txt')).isFile()).toEqual(true);
   })
+
+  describe('Test startAtTimestamp option', () => {
+    // @TODO: Fix this test
+    test.skip('Test without startAtTimestamp option', async () => {
+      const door = new EventEmitter();
+
+      const offsetTime = 5000;
+
+      await new Promise((resolve) => setTimeout(resolve, offsetTime));
+
+      const stubBitIntEvent = jest.fn()
+      door.on("doorbell", stubBitIntEvent);
+
+      handler(door, { mode: 'manual', events: ['doorbell'] })
+
+      const spyEmitter = jest.spyOn(door, 'emit')
+
+      door.emit("doorbell", { s: BigInt(42) });
+      await new Promise((resolve) => setTimeout(resolve, 400));
+
+      door.emit("doorbell", { s: BigInt(42) });
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      door.emit("doorbell", { s: BigInt(42) });
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      door.emit("doorbell", { s: BigInt(42) });
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      expect(spyEmitter).toHaveBeenCalledTimes(4)
+      expect(stubBitIntEvent).toHaveBeenNthCalledWith(4, { s: BigInt(42) })
+
+      await replayEnd();
+
+      expect((await fs.stat('replay.txt')).isFile()).toEqual(true);
+
+      const data = await fs.readFile('replay.txt', "utf-8");
+      expect(parseInt(data.split(" ")[0].split("\t")[0], 10)).toBeGreaterThan(offsetTime);
+    }, 15000)
+
+    test('Test with startAtTimestamp option', async () => {
+      const door = new EventEmitter();
+
+      const offsetTime = 5000;
+
+      await new Promise((resolve) => setTimeout(resolve, offsetTime));
+
+      const stubBitIntEvent = jest.fn()
+      door.on("doorbell", stubBitIntEvent);
+
+      handler(door, { startAtTimestamp: performance.now(), mode: 'manual', events: ['doorbell'] })
+
+      const spyEmitter = jest.spyOn(door, 'emit')
+
+      door.emit("doorbell", { s: BigInt(42) });
+      await new Promise((resolve) => setTimeout(resolve, 400));
+
+      door.emit("doorbell", { s: BigInt(42) });
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      door.emit("doorbell", { s: BigInt(42) });
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      door.emit("doorbell", { s: BigInt(42) });
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      expect(spyEmitter).toHaveBeenCalledTimes(4)
+      expect(stubBitIntEvent).toHaveBeenNthCalledWith(4, { s: BigInt(42) })
+
+      await replayEnd();
+
+      expect((await fs.stat('replay.txt')).isFile()).toEqual(true);
+
+      const data = await fs.readFile('replay.txt', "utf-8");
+      expect(parseInt(data.split(" ")[0].split("\t")[0], 10)).toBeLessThan(offsetTime);
+    }, 15000)
+  });
 })
